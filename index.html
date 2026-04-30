@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅館日語帳</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #faf8f3;
+  --bg2: #f3ede2;
+  --bg3: #ebe3d4;
+  --ink: #1a1614;
+  --ink2: #5a4f46;
+  --ink3: #9a8e84;
+  --accent: #8b2e2e;
+  --accent2: #c9563f;
+  --gold: #c4922a;
+  --green: #2a6b4a;
+  --blue: #2a5a8b;
+  --border: rgba(90,70,60,0.15);
+  --border2: rgba(90,70,60,0.28);
+  --shadow: 0 2px 12px rgba(90,60,40,0.09);
+  --radius: 10px;
+  --font-jp: 'Noto Serif JP', serif;
+  --font-ui: 'Noto Sans TC', 'Noto Sans JP', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+/* HEADER */
+.app-header {
+  background: var(--accent); color: #fff; height: 56px;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+  position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 10px rgba(139,46,46,0.3);
+}
+.logo { font-family: var(--font-jp); font-size: 19px; font-weight: 600; letter-spacing: 0.04em; display: flex; align-items: baseline; gap: 10px; }
+.logo small { font-size: 10px; opacity: 0.65; font-family: var(--font-ui); font-weight: 300; letter-spacing: 0.1em; }
+.header-tools { display: flex; gap: 6px; }
+.hbtn { background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28); color: #fff; padding: 5px 13px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: var(--font-ui); transition: background .15s; }
+.hbtn:hover { background: rgba(255,255,255,0.26); }
+
+/* TAB BAR */
+.tab-bar {
+  background: #fff; border-bottom: 1px solid var(--border);
+  display: flex; padding: 0 16px;
+  position: sticky; top: 56px; z-index: 190;
+  box-shadow: 0 1px 4px rgba(90,60,40,0.06);
+  overflow-x: auto; scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 16px; height: 48px;
+  cursor: pointer; font-size: 14px; color: var(--ink3);
+  border-bottom: 2.5px solid transparent;
+  white-space: nowrap; transition: all .15s; user-select: none;
+}
+.tab:hover { color: var(--ink2); background: var(--bg2); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+.tab-icon { font-size: 16px; }
+.tab-badge { background: var(--bg3); border-radius: 10px; padding: 1px 6px; font-size: 11px; color: var(--ink3); }
+.tab.active .tab-badge { background: rgba(139,46,46,0.12); color: var(--accent); }
+
+/* PAGES */
+.page { display: none; padding: 26px; max-width: 1100px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* COMMON */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; gap: 14px; flex-wrap: wrap; }
+.page-title { font-family: var(--font-jp); font-size: 22px; font-weight: 500; }
+.page-sub { font-size: 13px; color: var(--ink3); margin-top: 3px; }
+
+.btn { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: var(--radius); cursor: pointer; font-size: 14px; font-family: var(--font-ui); font-weight: 500; transition: background .15s; white-space: nowrap; }
+.btn:hover { background: var(--accent2); }
+.btn.outline { background: none; border: 1px solid var(--border2); color: var(--ink2); }
+.btn.outline:hover { background: var(--bg3); }
+.btn.green { background: var(--green); }
+.btn.green:hover { background: #1f5239; }
+
+/* STAT CARDS */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow); }
+.stat-card.cr { border-left: 3px solid var(--accent); }
+.stat-card.cg { border-left: 3px solid var(--gold); }
+.stat-card.ck { border-left: 3px solid var(--green); }
+.stat-card.cb { border-left: 3px solid var(--blue); }
+.stat-lbl { font-size: 11px; color: var(--ink3); margin-bottom: 4px; }
+.stat-val { font-size: 28px; font-weight: 500; font-family: var(--font-jp); }
+.stat-sub { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+
+/* TOOLBAR */
+.toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-wrap::before { content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
+.search-wrap input { width: 100%; background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 9px 12px 9px 36px; font-size: 14px; font-family: var(--font-ui); color: var(--ink); outline: none; transition: border .15s; }
+.search-wrap input:focus { border-color: var(--accent); }
+select { background: #fff; border: 1px solid var(--border2); border-radius: var(--radius); padding: 9px 12px; font-size: 14px; font-family: var(--font-ui); color: var(--ink); cursor: pointer; outline: none; }
+select:focus { border-color: var(--accent); }
+
+/* CHIPS */
+.chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip { padding: 5px 12px; border: 1px solid var(--border2); border-radius: 20px; background: #fff; font-size: 13px; cursor: pointer; color: var(--ink2); font-family: var(--font-ui); transition: all .15s; display: flex; align-items: center; gap: 5px; }
+.chip:hover { background: var(--bg2); }
+.chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.chip .cdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* VOCAB CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.vocab-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; cursor: pointer; transition: box-shadow .2s, transform .2s; }
+.vocab-card:hover { box-shadow: 0 5px 22px rgba(90,60,40,0.15); transform: translateY(-2px); }
+.vc-img { width: 100%; max-height: 130px; object-fit: cover; border-bottom: 1px solid var(--border); display: block; }
+.vc-body { padding: 14px 15px 10px; border-bottom: 1px solid var(--border); }
+.type-badge { display: inline-block; font-size: 10px; letter-spacing: 0.07em; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; font-weight: 500; }
+.bw { background: rgba(139,46,46,0.1); color: var(--accent); }
+.bs { background: rgba(196,146,42,0.1); color: var(--gold); }
+.bp { background: rgba(42,107,74,0.1); color: var(--green); }
+.vc-jp { font-family: var(--font-jp); font-size: 19px; color: var(--ink); margin-bottom: 3px; line-height: 1.35; }
+.vc-reading { font-size: 12px; color: var(--ink3); font-family: var(--font-jp); margin-bottom: 4px; }
+.vc-meaning { font-size: 13px; color: var(--ink2); line-height: 1.5; }
+.vc-foot { padding: 8px 15px; display: flex; align-items: center; justify-content: space-between; }
+.fam-dots { display: flex; gap: 3px; align-items: center; }
+.dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--border2); cursor: pointer; transition: all .12s; }
+.dot.on { border-color: transparent; }
+.d1.on,.d2.on { background: #e24b4a; border-color: #e24b4a; }
+.d3.on,.d4.on { background: var(--gold); border-color: var(--gold); }
+.d5.on { background: var(--green); border-color: var(--green); }
+.vc-right { display: flex; align-items: center; gap: 7px; }
+.rev-cnt { font-size: 11px; color: var(--ink3); }
+.cat-pill { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: var(--bg2); color: var(--ink3); }
+.icon-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 4px 5px; border-radius: 5px; transition: background .12s; color: var(--ink3); line-height: 1; }
+.icon-btn:hover { background: var(--bg2); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 50px 20px; color: var(--ink3); }
+.empty .big { font-size: 44px; margin-bottom: 12px; }
+.empty p { font-size: 15px; line-height: 1.8; }
+
+/* MODAL */
+.overlay { position: fixed; inset: 0; background: rgba(26,22,20,0.52); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(2px); }
+.overlay.hidden { display: none; }
+.modal { background: var(--bg); border-radius: 14px; box-shadow: 0 10px 44px rgba(26,22,20,0.22); width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto; padding: 26px 28px; }
+.modal-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-hd h3 { font-size: 18px; font-weight: 500; font-family: var(--font-jp); }
+.close-btn { background: var(--bg3); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 15px; color: var(--ink2); display: flex; align-items: center; justify-content: center; transition: background .12s; }
+.close-btn:hover { background: var(--border2); }
+
+/* FORM */
+.fg { margin-bottom: 14px; }
+.fg label { display: block; font-size: 12px; color: var(--ink3); margin-bottom: 5px; }
+.fg label span { color: var(--accent); }
+.fi,.ft,.fs { width: 100%; background: #fff; border: 1px solid var(--border2); border-radius: 8px; padding: 9px 13px; font-size: 14px; font-family: var(--font-ui); color: var(--ink); outline: none; transition: border .15s; }
+.fi:focus,.ft:focus,.fs:focus { border-color: var(--accent); }
+.ft { resize: vertical; min-height: 76px; line-height: 1.6; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.reading-hint { font-size: 12px; color: var(--ink3); margin-top: 5px; }
+.reading-hint button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; padding: 0; text-decoration: underline; font-family: var(--font-ui); }
+.radio-row { display: flex; gap: 16px; }
+.radio-row label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 14px; color: var(--ink2); }
+.fam-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.fam-opt { display: none; }
+.fam-lbl { padding: 6px 11px; border: 1px solid var(--border2); border-radius: 20px; cursor: pointer; font-size: 13px; color: var(--ink2); transition: all .12s; }
+.fam-opt:checked + .fam-lbl { border-color: var(--accent); background: rgba(139,46,46,0.08); color: var(--accent); font-weight: 500; }
+.img-upload { border: 2px dashed var(--border2); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; color: var(--ink3); font-size: 13px; transition: border-color .15s; }
+.img-upload:hover { border-color: var(--accent); }
+.img-prev { width: 100%; max-height: 160px; object-fit: cover; border-radius: 8px; margin-top: 8px; }
+
+/* DETAIL */
+.detail-jp { font-family: var(--font-jp); font-size: 30px; margin-bottom: 4px; }
+.detail-reading { font-family: var(--font-jp); font-size: 15px; color: var(--ink3); margin-bottom: 10px; }
+.detail-meaning { font-size: 15px; color: var(--ink2); line-height: 1.7; margin-bottom: 10px; }
+.detail-note { font-size: 13px; color: var(--ink3); background: var(--bg2); padding: 10px 13px; border-radius: 8px; line-height: 1.6; }
+.detail-img { width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; }
+.detail-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); align-items: center; font-size: 13px; color: var(--ink3); }
+.detail-meta strong { color: var(--ink); }
+.fam-display { display: flex; gap: 4px; }
+.fd { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border2); }
+.fd.on { border-color: transparent; }
+.detail-actions { display: flex; gap: 8px; margin-top: 16px; }
+.detail-actions .btn { flex: 1; padding: 10px; font-size: 14px; }
+
+/* REVIEW PAGE */
+.review-layout { display: grid; grid-template-columns: 200px 1fr; gap: 24px; }
+.rev-sidebar { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; height: fit-content; box-shadow: var(--shadow); }
+.rev-sidebar h4 { font-size: 13px; color: var(--ink3); margin-bottom: 10px; letter-spacing: 0.05em; }
+.rev-opt { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--ink2); transition: all .12s; margin-bottom: 3px; }
+.rev-opt:hover { background: var(--bg2); }
+.rev-opt.active { background: rgba(139,46,46,0.09); color: var(--accent); font-weight: 500; }
+.rev-opt .rd { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.prog-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink3); margin-bottom: 6px; }
+.prog-bar { background: var(--bg3); border-radius: 4px; height: 7px; }
+.prog-fill { background: var(--accent); height: 100%; border-radius: 4px; transition: width .35s; }
+.rev-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); padding: 32px 28px; text-align: center; min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.rc-type { font-size: 12px; color: var(--ink3); }
+.rc-jp { font-family: var(--font-jp); font-size: 36px; color: var(--ink); line-height: 1.3; }
+.rc-img { width: 100%; max-height: 140px; object-fit: cover; border-radius: 8px; }
+.rc-reading { font-family: var(--font-jp); font-size: 16px; color: var(--ink3); }
+.rc-meaning { font-size: 15px; color: var(--ink2); line-height: 1.7; max-width: 360px; }
+.rc-note { font-size: 13px; color: var(--ink3); background: var(--bg2); padding: 9px 13px; border-radius: 8px; text-align: left; width: 100%; max-width: 360px; line-height: 1.6; }
+.rev-btns { display: flex; justify-content: center; gap: 12px; margin-top: 16px; }
+.rev-btns .btn { padding: 11px 26px; font-size: 15px; }
+.rev-idle { color: var(--ink3); font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+/* CATEGORY PAGE */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.cat-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+.cc-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.cc-circle { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
+.cc-name { font-size: 15px; font-weight: 500; }
+.cc-count { font-size: 12px; color: var(--ink3); margin-bottom: 8px; }
+.cc-bar-bg { background: var(--bg3); border-radius: 4px; height: 5px; margin-bottom: 10px; }
+.cc-bar { height: 5px; border-radius: 4px; transition: width .4s; }
+.cc-foot { display: flex; gap: 6px; }
+.cc-btn { font-size: 12px; padding: 4px 10px; border: 1px solid var(--border2); border-radius: 6px; background: none; cursor: pointer; color: var(--ink3); font-family: var(--font-ui); transition: all .12s; }
+.cc-btn:hover { color: var(--accent); border-color: var(--accent); }
+.add-cat-box { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); max-width: 440px; }
+.add-cat-box h4 { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+.swatches { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
+.swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: transform .1s; }
+.swatch.sel { border-color: var(--ink); transform: scale(1.2); }
+.cat-add-row { display: flex; gap: 8px; }
+.cat-list-box { margin-top: 28px; }
+.cat-list-box h4 { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+.cli { display: flex; align-items: center; gap: 10px; padding: 10px 13px; background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+.cli .n { flex: 1; font-size: 14px; }
+.cli .c { font-size: 12px; color: var(--ink3); }
+.del-btn { background: none; border: none; cursor: pointer; font-size: 14px; padding: 3px 6px; border-radius: 5px; color: var(--ink3); }
+.del-btn:hover { background: #fde; color: var(--accent); }
+
+/* STATS */
+.stats-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-bottom: 28px; }
+.stats-sec h3 { font-size: 15px; font-weight: 500; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.rank-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; box-shadow: var(--shadow); }
+.rank-n { font-size: 17px; font-weight: 500; font-family: var(--font-jp); width: 26px; text-align: center; color: var(--ink3); }
+.rank-n.top { color: var(--gold); }
+.rank-info { flex: 1; }
+.rank-jp { font-family: var(--font-jp); font-size: 15px; }
+.rank-meta { font-size: 11px; color: var(--ink3); }
+.rank-rev { font-size: 18px; font-weight: 500; font-family: var(--font-jp); color: var(--ink2); }
+.fam-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fam-lbl-s { font-size: 12px; width: 90px; color: var(--ink2); }
+.fam-bg { flex: 1; background: var(--bg3); border-radius: 4px; height: 11px; }
+.fam-fill { height: 11px; border-radius: 4px; transition: width .4s; }
+.fam-cnt { font-size: 12px; width: 28px; text-align: right; color: var(--ink3); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--ink); color: #fff; padding: 10px 17px; border-radius: 10px; font-size: 14px; z-index: 1000; opacity: 0; transform: translateY(8px); transition: all .22s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.ok { background: var(--green); }
+.toast.err { background: var(--accent); }
+
+/* LOADING */
+.loading-cover { position: fixed; inset: 0; background: rgba(250,248,243,0.82); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; font-size: 15px; color: var(--ink2); }
+.loading-cover.hidden { display: none; }
+.spin { width: 30px; height: 30px; border: 3px solid var(--bg3); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .page { padding: 14px; }
+  .review-layout { grid-template-columns: 1fr; }
+  .rev-sidebar { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; }
+  .rev-sidebar h4 { width: 100%; margin-bottom: 2px; }
+  .rev-opt { padding: 5px 9px; margin-bottom: 0; }
+  .form-row { grid-template-columns: 1fr; }
+  .stats-2col { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading-cover hidden" id="loading"><div class="spin"></div><span id="loading-msg">載入中…</span></div>
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="logo">旅館日語帳 <small>ホテル日本語ノート</small></div>
+  <div class="header-tools">
+    <button class="hbtn" onclick="exportData()">📤 匯出</button>
+    <button class="hbtn" onclick="document.getElementById('importFile').click()">📥 匯入</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</header>
+
+<!-- TAB BAR -->
+<nav class="tab-bar">
+  <div class="tab active" onclick="goTab('home')" id="tab-home"><span class="tab-icon">🏠</span> 首頁</div>
+  <div class="tab" onclick="goTab('vocab')" id="tab-vocab"><span class="tab-icon">📚</span> 詞彙庫 <span class="tab-badge" id="badge-vocab">0</span></div>
+  <div class="tab" onclick="goTab('add')" id="tab-add"><span class="tab-icon">✍️</span> 新增詞彙</div>
+  <div class="tab" onclick="goTab('review')" id="tab-review"><span class="tab-icon">🔁</span> 複習</div>
+  <div class="tab" onclick="goTab('cats')" id="tab-cats"><span class="tab-icon">🗂</span> 分類管理</div>
+  <div class="tab" onclick="goTab('stats')" id="tab-stats"><span class="tab-icon">📊</span> 統計</div>
+</nav>
+
+<!-- ══ PAGE: HOME ══ -->
+<div class="page active" id="page-home">
+  <div class="page-header">
+    <div><div class="page-title">おはようございます 👋</div><div class="page-sub">今日も頑張りましょう！繼續練習旅館日語</div></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card cr"><div class="stat-lbl">詞彙總數</div><div class="stat-val" id="hs-total">0</div></div>
+    <div class="stat-card cb"><div class="stat-lbl">今日複習</div><div class="stat-val" id="hs-today">0</div><div class="stat-sub">次</div></div>
+    <div class="stat-card cg"><div class="stat-lbl">熟悉中</div><div class="stat-val" id="hs-mid">0</div><div class="stat-sub">3–4 分</div></div>
+    <div class="stat-card ck"><div class="stat-lbl">已掌握</div><div class="stat-val" id="hs-master">0</div><div class="stat-sub">5 分</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:28px">
+    <div class="vocab-card" onclick="goTab('add')" style="cursor:pointer;padding:20px;display:flex;align-items:center;gap:14px">
+      <span style="font-size:30px">✍️</span><div><div style="font-size:14px;font-weight:500">新增詞彙</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">輸入日文、讀音、意思</div></div>
+    </div>
+    <div class="vocab-card" onclick="goTab('review')" style="cursor:pointer;padding:20px;display:flex;align-items:center;gap:14px">
+      <span style="font-size:30px">🔁</span><div><div style="font-size:14px;font-weight:500">開始複習</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">閃卡練習，強化記憶</div></div>
+    </div>
+    <div class="vocab-card" onclick="goTab('vocab')" style="cursor:pointer;padding:20px;display:flex;align-items:center;gap:14px">
+      <span style="font-size:30px">📖</span><div><div style="font-size:14px;font-weight:500">瀏覽詞彙庫</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">搜尋、篩選、編輯</div></div>
+    </div>
+    <div class="vocab-card" onclick="goTab('stats')" style="cursor:pointer;padding:20px;display:flex;align-items:center;gap:14px">
+      <span style="font-size:30px">📊</span><div><div style="font-size:14px;font-weight:500">查看統計</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">複習排名、熟悉度分布</div></div>
+    </div>
+  </div>
+  <div style="font-size:15px;font-weight:500;margin-bottom:12px">🔴 需要加強（熟悉度 1–2 分）</div>
+  <div class="card-grid" id="home-weak"></div>
+  <div class="empty hidden" id="home-weak-empty"><div class="big">🎉</div><p>目前沒有需要加強的詞彙，繼續保持！</p></div>
+</div>
+
+<!-- ══ PAGE: VOCAB ══ -->
+<div class="page" id="page-vocab">
+  <div class="page-header">
+    <div><div class="page-title">詞彙庫</div><div class="page-sub">瀏覽、搜尋、編輯所有詞彙</div></div>
+    <button class="btn" onclick="goTab('add')">＋ 新增詞彙</button>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><input type="text" id="v-search" placeholder="搜尋日文、中文意思、讀音…" oninput="renderVocab()"></div>
+    <select id="v-type" onchange="renderVocab()">
+      <option value="">全部類型</option>
+      <option value="word">單字</option>
+      <option value="sentence">例句</option>
+      <option value="phrase">短語</option>
+    </select>
+    <select id="v-sort" onchange="renderVocab()">
+      <option value="newest">最新加入</option>
+      <option value="reviews">複習次數</option>
+      <option value="fam-asc">熟悉度 ↑</option>
+      <option value="fam-desc">熟悉度 ↓</option>
+      <option value="jp">日文排序</option>
+    </select>
+  </div>
+  <div class="chip-row" id="v-chips"></div>
+  <div class="card-grid" id="v-grid"></div>
+  <div class="empty hidden" id="v-empty"><div class="big">📖</div><p>沒有符合的詞彙<br>試試其他搜尋條件，或新增詞彙！</p></div>
+</div>
+
+<!-- ══ PAGE: ADD ══ -->
+<div class="page" id="page-add">
+  <div class="page-header">
+    <div><div class="page-title" id="add-title">新增詞彙</div><div class="page-sub">輸入日文句子、單字或短語</div></div>
+  </div>
+  <div style="max-width:560px">
+    <div class="fg">
+      <label>類型</label>
+      <div class="radio-row">
+        <label><input type="radio" name="etype" value="word" checked> 單字</label>
+        <label><input type="radio" name="etype" value="sentence"> 例句</label>
+        <label><input type="radio" name="etype" value="phrase"> 短語</label>
+      </div>
+    </div>
+    <div class="fg">
+      <label>日文 <span>*</span></label>
+      <input class="fi" type="text" id="a-jp" placeholder="輸入日文…">
+      <div class="reading-hint">輸入後 <button onclick="autoFurigana()">✨ 自動標讀音</button>（需要網路，使用 Jisho）</div>
+    </div>
+    <div class="fg">
+      <label>讀音（平假名）</label>
+      <input class="fi" type="text" id="a-reading" placeholder="自動填入或手動輸入…">
+    </div>
+    <div class="fg">
+      <label>中文意思 <span>*</span></label>
+      <textarea class="ft" id="a-meaning" placeholder="輸入中文翻譯或意思…"></textarea>
+    </div>
+    <div class="fg">
+      <label>備注 / 使用情境</label>
+      <textarea class="ft" id="a-note" placeholder="例：辦理入住時使用、對客人問候…" style="min-height:62px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="fg">
+        <label>分類</label>
+        <select class="fs" id="a-cat"></select>
+      </div>
+      <div class="fg">
+        <label>熟悉度</label>
+        <div class="fam-row">
+          <input type="radio" name="efam" value="0" id="ef0" class="fam-opt" checked><label for="ef0" class="fam-lbl">未評</label>
+          <input type="radio" name="efam" value="1" id="ef1" class="fam-opt"><label for="ef1" class="fam-lbl">🔴 1</label>
+          <input type="radio" name="efam" value="2" id="ef2" class="fam-opt"><label for="ef2" class="fam-lbl">🔴 2</label>
+          <input type="radio" name="efam" value="3" id="ef3" class="fam-opt"><label for="ef3" class="fam-lbl">🟡 3</label>
+          <input type="radio" name="efam" value="4" id="ef4" class="fam-opt"><label for="ef4" class="fam-lbl">🟡 4</label>
+          <input type="radio" name="efam" value="5" id="ef5" class="fam-opt"><label for="ef5" class="fam-lbl">🟢 5</label>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <label>圖片（可選）</label>
+      <div class="img-upload" onclick="document.getElementById('a-img-file').click()">
+        <span id="a-img-hint">📷 點擊上傳圖片（JPG / PNG）</span>
+        <img id="a-img-prev" class="img-prev" style="display:none" alt="">
+      </div>
+      <input type="file" id="a-img-file" accept="image/*" style="display:none" onchange="previewImg(event)">
+      <div style="margin-top:6px;font-size:12px;color:var(--ink3)">或貼上圖片網址：<input type="text" id="a-img-url" class="fi" style="margin-top:4px" placeholder="https://…" oninput="previewImgUrl()"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn outline" id="cancel-edit-btn" onclick="cancelEdit()" style="display:none">✕ 取消編輯</button>
+      <button class="btn" onclick="saveEntry()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: REVIEW ══ -->
+<div class="page" id="page-review">
+  <div class="page-header">
+    <div><div class="page-title">複習模式</div><div class="page-sub">看日文猜中文，強化記憶</div></div>
+  </div>
+  <div class="review-layout">
+    <div class="rev-sidebar">
+      <h4>選擇範圍</h4>
+      <div class="rev-opt active" onclick="pickReview('all',this)"><span class="rd" style="background:var(--ink3)"></span> 全部詞彙</div>
+      <div class="rev-opt" onclick="pickReview('weak',this)"><span class="rd" style="background:#e24b4a"></span> 不熟 (1–2分)</div>
+      <div id="rev-cat-opts"></div>
+    </div>
+    <div>
+      <div class="prog-row"><span id="rev-prog">0 / 0</span><span id="rev-correct">正確 0</span></div>
+      <div class="prog-bar" style="margin-bottom:18px"><div class="prog-fill" id="rev-bar" style="width:0%"></div></div>
+      <div class="rev-card" id="rev-card">
+        <div class="rev-idle"><span style="font-size:40px">🃏</span><span>請從左側選擇複習範圍</span></div>
+      </div>
+      <div class="rev-btns" id="rev-btns" style="display:none">
+        <button class="btn outline" onclick="reviewAnswer('wrong')" style="color:var(--accent)">❌ 不熟悉</button>
+        <button class="btn green" onclick="reviewAnswer('correct')">✓ 認識了！</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: CATS ══ -->
+<div class="page" id="page-cats">
+  <div class="page-header">
+    <div><div class="page-title">分類管理</div><div class="page-sub">自訂分類，讓詞彙更好整理</div></div>
+  </div>
+  <div class="cat-grid" id="cat-overview"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+    <div class="add-cat-box">
+      <h4>新增分類</h4>
+      <div style="font-size:12px;color:var(--ink3);margin-bottom:7px">選擇顏色</div>
+      <div class="swatches" id="swatches"></div>
+      <div class="cat-add-row">
+        <input class="fi" type="text" id="new-cat-input" placeholder="分類名稱（例：接待用語）" style="flex:1">
+        <button class="btn" onclick="addCat()">新增</button>
+      </div>
+    </div>
+    <div class="cat-list-box">
+      <h4>現有分類</h4>
+      <div id="cat-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: STATS ══ -->
+<div class="page" id="page-stats">
+  <div class="page-header">
+    <div><div class="page-title">統計</div><div class="page-sub">了解你的學習狀況與進度</div></div>
+  </div>
+  <div class="stats-row" style="margin-bottom:28px">
+    <div class="stat-card cr"><div class="stat-lbl">詞彙總數</div><div class="stat-val" id="st-total">0</div></div>
+    <div class="stat-card cb"><div class="stat-lbl">總複習次數</div><div class="stat-val" id="st-revs">0</div></div>
+    <div class="stat-card ck"><div class="stat-lbl">已掌握 (5分)</div><div class="stat-val" id="st-master">0</div></div>
+    <div class="stat-card cg"><div class="stat-lbl">今日複習</div><div class="stat-val" id="st-today">0</div></div>
+  </div>
+  <div class="stats-2col">
+    <div class="stats-sec"><h3>🏆 複習次數排名</h3><div id="rank-list"></div></div>
+    <div class="stats-sec"><h3>📈 熟悉度分布</h3><div id="fam-bars"></div></div>
+  </div>
+  <div class="stats-sec"><h3>🗂 各分類詞彙數</h3><div class="cat-grid" id="stats-cats"></div></div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay hidden" id="detail-overlay">
+  <div class="modal">
+    <div class="modal-hd"><h3 id="d-type">詞彙詳情</h3><button class="close-btn" onclick="closeDetail()">✕</button></div>
+    <img id="d-img" class="detail-img" style="display:none" alt="">
+    <div class="detail-jp" id="d-jp"></div>
+    <div class="detail-reading" id="d-reading"></div>
+    <div class="detail-meaning" id="d-meaning"></div>
+    <div class="detail-note" id="d-note" style="display:none"></div>
+    <div class="detail-meta">
+      <div>熟悉度：<span class="fam-display" id="d-fam"></span></div>
+      <div>複習：<strong id="d-revs">0</strong> 次</div>
+      <div>分類：<strong id="d-cat">—</strong></div>
+    </div>
+    <div class="detail-actions">
+      <button class="btn" onclick="markReview()">✓ 複習 +1</button>
+      <button class="btn outline" onclick="editFromDetail()">✏ 編輯</button>
+      <button class="btn outline" onclick="deleteFromDetail()" style="color:var(--accent)">🗑 刪除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ STATE ══
+const SK='rkv3', CK='rkcv3', TK='rktv3';
+let data=[], cats=[], todayCount=0;
+let editId=null, detailId=null, imgB64='', selCat=null;
+let revQ=[], revIdx=0, revOk=0;
+let selColor='#8b2e2e';
+const COLORS=['#8b2e2e','#c9563f','#c4922a','#2a6b4a','#2a5a8b','#6b3a8b','#2a7b8b','#5a4f46'];
+const TL={word:'單字',sentence:'例句',phrase:'短語'};
+const TB={word:'bw',sentence:'bs',phrase:'bp'};
+
+// ══ STORAGE ══
+function save(){localStorage.setItem(SK,JSON.stringify(data));localStorage.setItem(CK,JSON.stringify(cats));refresh();}
+function load(){
+  const d=localStorage.getItem(SK),c=localStorage.getItem(CK),t=localStorage.getItem(TK);
+  data=d?JSON.parse(d):[];cats=c?JSON.parse(c):defaultCats();
+  const ts=t?JSON.parse(t):{};todayCount=ts.date===new Date().toDateString()?ts.count||0:0;
+}
+function saveToday(){localStorage.setItem(TK,JSON.stringify({date:new Date().toDateString(),count:todayCount}));}
+function defaultCats(){return[
+  {id:'check-in',name:'入住接待',color:'#8b2e2e'},{id:'dining',name:'餐飲服務',color:'#c4922a'},
+  {id:'room',name:'客房服務',color:'#2a6b4a'},{id:'concierge',name:'諮詢服務',color:'#2a5a8b'},
+  {id:'checkout',name:'退房結帳',color:'#6b3a8b'},{id:'general',name:'日常用語',color:'#5a4f46'},
+];}
+
+// ══ TABS ══
+function goTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='home') renderHome();
+  if(name==='vocab'){renderChips();renderVocab();}
+  if(name==='review') renderRevOpts();
+  if(name==='cats'){renderCatOverview();renderCatList();renderSwatches();}
+  if(name==='stats') renderStats();
+}
+
+// ══ REFRESH ══
+function refresh(){
+  document.getElementById('badge-vocab').textContent=data.length;
+  document.getElementById('hs-total').textContent=data.length;
+  document.getElementById('hs-today').textContent=todayCount;
+  document.getElementById('hs-mid').textContent=data.filter(d=>d.familiarity>=3&&d.familiarity<=4).length;
+  document.getElementById('hs-master').textContent=data.filter(d=>d.familiarity===5).length;
+}
+
+// ══ HOME ══
+function renderHome(){
+  refresh();
+  const weak=data.filter(d=>!d.familiarity||d.familiarity<=2).slice(0,6);
+  const g=document.getElementById('home-weak'),e=document.getElementById('home-weak-empty');
+  if(!weak.length){g.innerHTML='';e.classList.remove('hidden');}
+  else{e.classList.add('hidden');g.innerHTML=weak.map(cardHTML).join('');}
+}
+
+// ══ VOCAB ══
+function renderChips(){
+  document.getElementById('v-chips').innerHTML=
+    `<span class="chip ${!selCat?'active':''}" onclick="setCat(null,this)">全部</span>`+
+    cats.map(c=>`<span class="chip ${selCat===c.id?'active':''}" onclick="setCat('${c.id}',this)"><span class="cdot" style="background:${c.color}"></span>${c.name}</span>`).join('');
+}
+function setCat(id,el){selCat=id;document.querySelectorAll('#v-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderVocab();}
+function renderVocab(){
+  let list=[...data];
+  if(selCat) list=list.filter(d=>d.cat===selCat);
+  const q=(document.getElementById('v-search')?.value||'').toLowerCase();
+  if(q) list=list.filter(d=>d.jp.toLowerCase().includes(q)||d.meaning.toLowerCase().includes(q)||(d.reading||'').toLowerCase().includes(q));
+  const tp=document.getElementById('v-type')?.value||'';
+  if(tp) list=list.filter(d=>d.type===tp);
+  const so=document.getElementById('v-sort')?.value||'newest';
+  if(so==='newest') list.sort((a,b)=>b.created-a.created);
+  if(so==='reviews') list.sort((a,b)=>(b.reviews||0)-(a.reviews||0));
+  if(so==='fam-asc') list.sort((a,b)=>(a.familiarity||0)-(b.familiarity||0));
+  if(so==='fam-desc') list.sort((a,b)=>(b.familiarity||0)-(a.familiarity||0));
+  if(so==='jp') list.sort((a,b)=>a.jp.localeCompare(b.jp,'ja'));
+  const g=document.getElementById('v-grid'),e=document.getElementById('v-empty');
+  if(!list.length){g.innerHTML='';e.classList.remove('hidden');}
+  else{e.classList.add('hidden');g.innerHTML=list.map(cardHTML).join('');}
+}
+function cardHTML(item){
+  const cat=cats.find(c=>c.id===item.cat);
+  const dots=[1,2,3,4,5].map(i=>`<span class="dot d${i} ${item.familiarity&&i<=item.familiarity?'on':''}" onclick="qFam(event,'${item.id}',${i})"></span>`).join('');
+  const img=item.img?`<img class="vc-img" src="${item.img}" alt="" loading="lazy" onerror="this.style.display='none'">`:''
+  return`<div class="vocab-card" onclick="openDetail('${item.id}')">
+    ${img}<div class="vc-body">
+      <span class="type-badge ${TB[item.type]||'bw'}">${TL[item.type]||'單字'}</span>
+      <div class="vc-jp">${item.jp}</div>
+      ${item.reading?`<div class="vc-reading">${item.reading}</div>`:''}
+      <div class="vc-meaning">${item.meaning}</div>
+    </div>
+    <div class="vc-foot">
+      <div class="fam-dots">${dots}</div>
+      <div class="vc-right">
+        <span class="rev-cnt">${item.reviews||0}x</span>
+        ${cat?`<span class="cat-pill" style="color:${cat.color}">${cat.name}</span>`:''}
+        <button class="icon-btn" onclick="event.stopPropagation();startEdit('${item.id}')">✏</button>
+        <button class="icon-btn" onclick="event.stopPropagation();delEntry('${item.id}')">🗑</button>
+      </div>
+    </div>
+  </div>`;
+}
+function qFam(e,id,f){e.stopPropagation();const item=data.find(d=>d.id===id);if(!item)return;item.familiarity=f;save();renderVocab();renderHome();}
+
+// ══ ADD / EDIT ══
+function fillCatSel(selId){
+  document.getElementById('a-cat').innerHTML=`<option value="">無分類</option>`+cats.map(c=>`<option value="${c.id}"${selId===c.id?' selected':''}>${c.name}</option>`).join('');
+}
+function startEdit(id){
+  const item=data.find(d=>d.id===id);if(!item)return;
+  editId=id;imgB64=item.imgBase64||'';
+  document.getElementById('add-title').textContent='編輯詞彙';
+  document.getElementById('a-jp').value=item.jp;
+  document.getElementById('a-reading').value=item.reading||'';
+  document.getElementById('a-meaning').value=item.meaning;
+  document.getElementById('a-note').value=item.note||'';
+  document.getElementById('a-img-url').value=(!item.imgBase64&&item.img)?item.img:'';
+  const prev=document.getElementById('a-img-prev');
+  if(item.img){prev.src=item.img;prev.style.display='';document.getElementById('a-img-hint').style.display='none';}
+  else{prev.style.display='none';document.getElementById('a-img-hint').style.display='';}
+  document.querySelectorAll('input[name="etype"]').forEach(r=>r.checked=r.value===item.type);
+  document.querySelectorAll('input[name="efam"]').forEach(r=>r.checked=r.value==(item.familiarity||0));
+  fillCatSel(item.cat);
+  document.getElementById('cancel-edit-btn').style.display='';
+  goTab('add');
+}
+function cancelEdit(){
+  editId=null;imgB64='';resetAddForm();
+  document.getElementById('cancel-edit-btn').style.display='none';
+  goTab('vocab');
+}
+function resetAddForm(){
+  document.getElementById('add-title').textContent='新增詞彙';
+  ['a-jp','a-reading','a-meaning','a-note','a-img-url'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('a-img-prev').style.display='none';
+  document.getElementById('a-img-hint').style.display='';
+  document.querySelector('input[name="etype"][value="word"]').checked=true;
+  document.querySelector('input[name="efam"][value="0"]').checked=true;
+  fillCatSel();
+}
+function saveEntry(){
+  const jp=document.getElementById('a-jp').value.trim();
+  const meaning=document.getElementById('a-meaning').value.trim();
+  if(!jp||!meaning){showToast('請填入日文和中文意思','err');return;}
+  const imgUrl=document.getElementById('a-img-url').value.trim();
+  const img=imgB64||imgUrl||'';
+  const entry={
+    id:editId||'v'+Date.now(),
+    type:document.querySelector('input[name="etype"]:checked').value,
+    jp,reading:document.getElementById('a-reading').value.trim(),
+    meaning,note:document.getElementById('a-note').value.trim(),
+    cat:document.getElementById('a-cat').value,
+    familiarity:parseInt(document.querySelector('input[name="efam"]:checked').value)||0,
+    img,imgBase64:imgB64,reviews:0,created:Date.now(),
+  };
+  if(editId){const idx=data.findIndex(d=>d.id===editId);if(idx!==-1){entry.reviews=data[idx].reviews;entry.created=data[idx].created;data[idx]=entry;}}
+  else data.unshift(entry);
+  editId=null;imgB64='';
+  save();resetAddForm();
+  document.getElementById('cancel-edit-btn').style.display='none';
+  showToast('已儲存！','ok');goTab('vocab');
+}
+
+// ══ FURIGANA ══
+async function autoFurigana(){
+  const jp=document.getElementById('a-jp').value.trim();
+  if(!jp){showToast('請先輸入日文','err');return;}
+  showLoading('查詢讀音中…');
+  try{
+    const res=await fetch(`https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(jp)}`);
+    const json=await res.json();
+    if(json.data?.length>0){const j=json.data[0].japanese;if(j?.length>0&&j[0].reading){document.getElementById('a-reading').value=j[0].reading;showToast('讀音已填入！','ok');hideLoading();return;}}
+    showToast('找不到讀音，請手動輸入','err');
+  }catch{showToast('網路錯誤，請手動輸入','err');}
+  hideLoading();
+}
+
+// ══ IMAGE ══
+function previewImg(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{imgB64=ev.target.result;const p=document.getElementById('a-img-prev');p.src=imgB64;p.style.display='';document.getElementById('a-img-hint').style.display='none';};
+  reader.readAsDataURL(file);
+}
+function previewImgUrl(){
+  const url=document.getElementById('a-img-url').value.trim();const p=document.getElementById('a-img-prev');
+  if(url){imgB64='';p.src=url;p.style.display='';document.getElementById('a-img-hint').style.display='none';}
+  else{p.style.display='none';document.getElementById('a-img-hint').style.display='';}
+}
+
+// ══ DETAIL ══
+function openDetail(id){
+  const item=data.find(d=>d.id===id);if(!item)return;detailId=id;
+  const cat=cats.find(c=>c.id===item.cat);
+  document.getElementById('d-type').textContent=(TL[item.type]||'詞彙')+' 詳情';
+  document.getElementById('d-jp').textContent=item.jp;
+  document.getElementById('d-reading').textContent=item.reading||'';
+  document.getElementById('d-meaning').textContent=item.meaning;
+  const ne=document.getElementById('d-note');if(item.note){ne.textContent=item.note;ne.style.display='';}else ne.style.display='none';
+  const ie=document.getElementById('d-img');if(item.img){ie.src=item.img;ie.style.display='';}else ie.style.display='none';
+  document.getElementById('d-revs').textContent=item.reviews||0;
+  document.getElementById('d-cat').textContent=cat?cat.name:'—';
+  const fc={1:'#e24b4a',2:'#e24b4a',3:'var(--gold)',4:'var(--gold)',5:'var(--green)'};
+  document.getElementById('d-fam').innerHTML=[1,2,3,4,5].map(i=>{const on=item.familiarity&&i<=item.familiarity;return`<span class="fd ${on?'on':''}" style="${on?'background:'+fc[i]+';border-color:'+fc[i]:''}"></span>`;}).join('');
+  document.getElementById('detail-overlay').classList.remove('hidden');
+}
+function closeDetail(){document.getElementById('detail-overlay').classList.add('hidden');}
+function markReview(){const item=data.find(d=>d.id===detailId);if(!item)return;item.reviews=(item.reviews||0)+1;todayCount++;saveToday();save();document.getElementById('d-revs').textContent=item.reviews;showToast('複習已記錄！','ok');}
+function editFromDetail(){closeDetail();startEdit(detailId);}
+function deleteFromDetail(){if(!confirm('確定刪除？'))return;data=data.filter(d=>d.id!==detailId);save();closeDetail();renderVocab();renderHome();showToast('已刪除');}
+function delEntry(id){if(!confirm('確定刪除？'))return;data=data.filter(d=>d.id!==id);save();renderVocab();renderHome();showToast('已刪除');}
+
+// ══ REVIEW ══
+function renderRevOpts(){
+  document.getElementById('rev-cat-opts').innerHTML=cats.map(c=>`<div class="rev-opt" onclick="pickReview('cat:${c.id}',this)"><span class="rd" style="background:${c.color}"></span> ${c.name}</div>`).join('');
+}
+function pickReview(mode,el){
+  document.querySelectorAll('.rev-opt').forEach(e=>e.classList.remove('active'));el.classList.add('active');
+  let list=[];
+  if(mode==='all') list=[...data];
+  else if(mode==='weak') list=data.filter(d=>!d.familiarity||d.familiarity<=2);
+  else list=data.filter(d=>d.cat===mode.slice(4));
+  shuffle(list);revQ=list;revIdx=0;revOk=0;updateRevCard();
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+function updateRevCard(){
+  const tot=revQ.length;
+  document.getElementById('rev-bar').style.width=(tot?Math.round(revIdx/tot*100):0)+'%';
+  document.getElementById('rev-prog').textContent=`${revIdx} / ${tot}`;
+  document.getElementById('rev-correct').textContent=`正確 ${revOk}`;
+  if(!tot){document.getElementById('rev-card').innerHTML=`<div class="rev-idle"><span style="font-size:36px">😅</span><span>這個範圍還沒有詞彙</span></div>`;document.getElementById('rev-btns').style.display='none';return;}
+  if(revIdx>=tot){
+    const pct=Math.round(revOk/tot*100);
+    document.getElementById('rev-card').innerHTML=`<div style="font-size:42px">🎉</div><div style="font-size:20px;font-weight:500">複習完成！</div><div style="font-size:14px;color:var(--ink3)">共 ${tot} 個詞彙</div><div style="font-size:24px;color:var(--green);font-weight:500">${pct}% 正確率</div><button class="btn" onclick="revAgain()" style="margin-top:8px">再來一次</button>`;
+    document.getElementById('rev-btns').style.display='none';return;
+  }
+  const item=revQ[revIdx];
+  document.getElementById('rev-card').innerHTML=`
+    ${item.img?`<img class="rc-img" src="${item.img}" alt="" onerror="this.style.display='none'">`:''} 
+    <div class="rc-type">${TL[item.type]||'詞彙'}</div>
+    <div class="rc-jp">${item.jp}</div>
+    <button class="btn outline" onclick="revealAns('${item.id}')" style="margin-top:6px">顯示答案 ▼</button>
+    <div id="rev-ans" style="display:none">
+      ${item.reading?`<div class="rc-reading">${item.reading}</div>`:''}
+      <div class="rc-meaning">${item.meaning}</div>
+      ${item.note?`<div class="rc-note">${item.note}</div>`:''}
+    </div>`;
+  document.getElementById('rev-btns').style.display='none';
+}
+function revealAns(id){
+  document.getElementById('rev-ans').style.display='';
+  document.querySelector('#rev-card button.outline').style.display='none';
+  document.getElementById('rev-btns').style.display='flex';
+  const item=data.find(d=>d.id===id);if(item){item.reviews=(item.reviews||0)+1;todayCount++;saveToday();save();}
+}
+function reviewAnswer(result){
+  const item=revQ[revIdx];const d=data.find(x=>x.id===item.id);
+  if(result==='correct'){revOk++;if(d&&(d.familiarity||0)<5){d.familiarity=Math.min(5,(d.familiarity||0)+1);save();}}
+  else{if(d&&(d.familiarity||0)>1){d.familiarity=Math.max(1,(d.familiarity||0)-1);save();}}
+  revIdx++;updateRevCard();
+}
+function revAgain(){revIdx=0;revOk=0;shuffle(revQ);updateRevCard();}
+
+// ══ CATEGORIES ══
+function renderCatOverview(){
+  const max=Math.max(...cats.map(c=>data.filter(d=>d.cat===c.id).length),1);
+  document.getElementById('cat-overview').innerHTML=cats.map(c=>{
+    const cnt=data.filter(d=>d.cat===c.id).length;
+    return`<div class="cat-card"><div class="cc-top"><span class="cc-circle" style="background:${c.color}"></span><span class="cc-name">${c.name}</span></div><div class="cc-count">${cnt} 個詞彙</div><div class="cc-bar-bg"><div class="cc-bar" style="width:${Math.round(cnt/max*100)}%;background:${c.color}"></div></div><div class="cc-foot"><button class="cc-btn" onclick="viewCat('${c.id}')">查看詞彙</button><button class="cc-btn" onclick="delCat('${c.id}')">刪除</button></div></div>`;
+  }).join('');
+}
+function viewCat(id){selCat=id;goTab('vocab');renderChips();}
+function renderCatList(){
+  document.getElementById('cat-list').innerHTML=cats.map(c=>`
+    <div class="cli"><span class="cc-circle" style="background:${c.color}"></span><span class="n">${c.name}</span><span class="c">${data.filter(d=>d.cat===c.id).length} 詞</span><button class="del-btn" onclick="delCat('${c.id}')">✕</button></div>`).join('');
+}
+function renderSwatches(){
+  document.getElementById('swatches').innerHTML=COLORS.map(c=>`<span class="swatch ${c===selColor?'sel':''}" style="background:${c}" onclick="pickColor('${c}')"></span>`).join('');
+}
+function pickColor(c){selColor=c;renderSwatches();}
+function addCat(){
+  const name=document.getElementById('new-cat-input').value.trim();if(!name)return;
+  cats.push({id:'c'+Date.now(),name,color:selColor});save();
+  document.getElementById('new-cat-input').value='';
+  renderCatOverview();renderCatList();fillCatSel();showToast('分類已新增','ok');
+}
+function delCat(id){
+  const cnt=data.filter(d=>d.cat===id).length;
+  if(cnt&&!confirm(`此分類有 ${cnt} 個詞彙，刪除後歸為「無分類」，確定？`))return;
+  data.forEach(d=>{if(d.cat===id)d.cat='';});
+  cats=cats.filter(c=>c.id!==id);
+  if(selCat===id)selCat=null;
+  save();renderCatOverview();renderCatList();fillCatSel();showToast('已刪除');
+}
+
+// ══ STATS ══
+function renderStats(){
+  const totRevs=data.reduce((s,d)=>s+(d.reviews||0),0);
+  document.getElementById('st-total').textContent=data.length;
+  document.getElementById('st-revs').textContent=totRevs;
+  document.getElementById('st-master').textContent=data.filter(d=>d.familiarity===5).length;
+  document.getElementById('st-today').textContent=todayCount;
+  const top=[...data].sort((a,b)=>(b.reviews||0)-(a.reviews||0)).slice(0,8);
+  document.getElementById('rank-list').innerHTML=top.length?top.map((item,i)=>`
+    <div class="rank-item"><span class="rank-n ${i<3?'top':''}">${i+1}</span><div class="rank-info"><div class="rank-jp">${item.jp}</div><div class="rank-meta">${(item.reading||'').slice(0,16)} ${item.meaning.slice(0,18)}</div></div><span class="rank-rev">${item.reviews||0}</span></div>`).join(''):'<div style="color:var(--ink3);font-size:14px">還沒有複習記錄</div>';
+  const fgs=[
+    {label:'未評分 (0)',min:0,max:0,color:'var(--ink3)'},
+    {label:'🔴 不熟 (1)',min:1,max:1,color:'#e24b4a'},
+    {label:'🔴 加強 (2)',min:2,max:2,color:'#e87070'},
+    {label:'🟡 普通 (3)',min:3,max:3,color:'var(--gold)'},
+    {label:'🟡 良好 (4)',min:4,max:4,color:'#d4a820'},
+    {label:'🟢 掌握 (5)',min:5,max:5,color:'var(--green)'},
+  ];
+  const maxF=Math.max(...fgs.map(g=>data.filter(d=>(d.familiarity||0)>=g.min&&(d.familiarity||0)<=g.max).length),1);
+  document.getElementById('fam-bars').innerHTML=fgs.map(g=>{
+    const cnt=data.filter(d=>(d.familiarity||0)>=g.min&&(d.familiarity||0)<=g.max).length;
+    return`<div class="fam-row"><span class="fam-lbl-s">${g.label}</span><div class="fam-bg"><div class="fam-fill" style="width:${Math.round(cnt/maxF*100)}%;background:${g.color}"></div></div><span class="fam-cnt">${cnt}</span></div>`;
+  }).join('');
+  document.getElementById('stats-cats').innerHTML=cats.map(c=>{
+    const cnt=data.filter(d=>d.cat===c.id).length;
+    const m=data.filter(d=>d.cat===c.id&&d.familiarity===5).length;
+    return`<div class="cat-card"><div class="cc-top"><span class="cc-circle" style="background:${c.color}"></span><span class="cc-name">${c.name}</span></div><div class="cc-count">${cnt} 詞 · 掌握 ${m} 個</div><div class="cc-bar-bg"><div class="cc-bar" style="width:${cnt?Math.round(m/cnt*100):0}%;background:${c.color}"></div></div></div>`;
+  }).join('');
+}
+
+// ══ IMPORT / EXPORT ══
+function exportData(){
+  const blob=new Blob([JSON.stringify({data,cats},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ryokan-vocab-${new Date().toISOString().slice(0,10)}.json`;a.click();showToast('已匯出！');
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{const json=JSON.parse(ev.target.result);if(json.data)data=json.data;if(json.cats)cats=json.cats;else if(json.categories)cats=json.categories;save();renderHome();fillCatSel();showToast('匯入成功！','ok');}
+    catch{showToast('匯入失敗，格式有誤','err');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+// ══ UI ══
+function showLoading(msg){document.getElementById('loading-msg').textContent=msg||'載入中…';document.getElementById('loading').classList.remove('hidden');}
+function hideLoading(){document.getElementById('loading').classList.add('hidden');}
+function showToast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');setTimeout(()=>el.className='toast',2200);}
+
+// ══ INIT ══
+load();fillCatSel();refresh();renderHome();
+
+if(!data.length){
+  data=[
+    {id:'s1',type:'sentence',jp:'いらっしゃいませ',reading:'いらっしゃいませ',meaning:'歡迎光臨',note:'客人進門時使用，是最重要的迎賓語',cat:'check-in',familiarity:3,reviews:5,created:Date.now()-6e3},
+    {id:'s2',type:'sentence',jp:'チェックインのお手続きをさせていただきます',reading:'チェックインのおてつづきをさせていただきます',meaning:'為您辦理入住手續',note:'引導客人至前台時使用',cat:'check-in',familiarity:2,reviews:2,created:Date.now()-5e3},
+    {id:'s3',type:'word',jp:'ルームキー',reading:'ルームキー',meaning:'房卡 / 客房鑰匙',note:'交付房卡時說：こちらがお部屋のルームキーでございます',cat:'check-in',familiarity:4,reviews:8,created:Date.now()-4e3},
+    {id:'s4',type:'sentence',jp:'何かご不明な点はございませんか',reading:'なにかごふめいなてんはございませんか',meaning:'有任何不清楚的地方嗎？',note:'辦完入住後確認',cat:'general',familiarity:1,reviews:1,created:Date.now()-3e3},
+    {id:'s5',type:'word',jp:'朝食',reading:'ちょうしょく',meaning:'早餐',note:'朝食は7時から10時まででございます',cat:'dining',familiarity:5,reviews:12,created:Date.now()-2e3},
+    {id:'s6',type:'phrase',jp:'少々お待ちください',reading:'しょうしょうおまちください',meaning:'請稍等一下',note:'非常通用，任何需要客人等待時都可使用',cat:'general',familiarity:4,reviews:9,created:Date.now()-1e3},
+  ];
+  save();renderHome();
+}
+</script>
+</body>
+</html>
